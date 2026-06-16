@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Si Pipit Terbang! 🐦</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(180deg, #5BB8F5 0%, #87CEEB 40%, #A8D5A2 80%, #6BAA5E 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Dekorasi langit */
+.sun {
+  position: fixed;
+  top: 18px; right: 50px;
+  width: 64px; height: 64px;
+  background: #FFD93D;
+  border-radius: 50%;
+  box-shadow: 0 0 0 12px rgba(255,217,61,0.25), 0 0 0 24px rgba(255,217,61,0.1);
+}
+
+.cloud {
+  position: fixed;
+  background: rgba(255,255,255,0.92);
+  border-radius: 40px;
+  animation: driftCloud linear infinite;
+}
+.cloud::before { content:''; position:absolute; background:rgba(255,255,255,0.92); border-radius:50%; }
+@keyframes driftCloud { from{transform:translateX(-250px)} to{transform:translateX(110vw)} }
+
+.tree {
+  position: fixed;
+  bottom: 0;
+  font-size: 60px;
+  line-height: 1;
+}
+
+/* Header */
+#header {
+  width:100%; max-width:680px;
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 10px 16px 6px;
+  position: relative; z-index:20;
+}
+#title-txt {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 2px 3px 0 #2E7D32;
+  letter-spacing: 0.5px;
+}
+.badge {
+  background: rgba(255,255,255,0.92);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1B5E20;
+  border: 2px solid #4CAF50;
+}
+
+/* Progress bar */
+#prog-wrap {
+  width:100%; max-width:680px;
+  padding: 0 16px 4px;
+  position:relative; z-index:20;
+}
+#prog-track {
+  background: rgba(255,255,255,0.35);
+  border-radius: 10px; height: 10px;
+  overflow:hidden;
+}
+#prog-fill {
+  background: #FFD93D;
+  height:100%;
+  border-radius:10px;
+  transition: width 0.6s ease;
+}
+
+/* Game canvas area */
+#scene {
+  width:100%; max-width:680px;
+  height:220px;
+  position:relative;
+  overflow:hidden;
+  margin: 4px 0;
+}
+
+/* Ground */
+#ground-strip {
+  position:absolute; bottom:0; left:0; right:0;
+  height:36px;
+  background: linear-gradient(180deg, #6BAA5E 0%, #4A7C42 100%);
+  border-radius:0;
+  z-index:5;
+  display:flex; align-items:flex-start; gap:14px;
+  padding: 2px 10px;
+  overflow:hidden;
+}
+.grass { font-size:18px; flex-shrink:0; }
+
+/* Bird */
+#bird {
+  position:absolute;
+  font-size:40px;
+  left:80px;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:15;
+  transition: top 0.12s ease-out;
+  filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.2));
+}
+#bird.flap { animation: birdFlap 0.18s ease; }
+@keyframes birdFlap {
+  0%{transform:translateY(-50%) rotate(0deg)}
+  40%{transform:translateY(-60%) rotate(-18deg)}
+  100%{transform:translateY(-50%) rotate(0deg)}
+}
+#bird.fall { animation: birdFall 0.5s ease-in forwards; }
+@keyframes birdFall {
+  to{top:88%; transform:rotate(90deg);}
+}
+#bird.happy { animation: birdHappy 0.5s ease; }
+@keyframes birdHappy {
+  0%,100%{transform:translateY(-50%)}
+  25%{transform:translateY(-70%) rotate(-15deg)}
+  75%{transform:translateY(-30%) rotate(15deg)}
+}
+
+/* Pipes / obstacles */
+.pipe {
+  position:absolute;
+  background: linear-gradient(180deg, #4CAF50 0%, #2E7D32 100%);
+  border-radius: 6px;
+  border: 2px solid #1B5E20;
+  z-index: 8;
+  animation: movePipe 4.5s linear forwards;
+}
+@keyframes movePipe { from{left:700px} to{left:-120px} }
+.pipe-top { top:0; }
+.pipe-bottom { bottom:36px; }
+.pipe-label {
+  position:absolute;
+  background: #fff;
+  border:2px solid #1B5E20;
+  border-radius:8px;
+  padding:3px 8px;
+  font-size:12px;
+  font-weight:700;
+  color:#1B5E20;
+  white-space:nowrap;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:9;
+}
+
+/* Stars/coins floating */
+.star {
+  position:absolute;
+  font-size:22px;
+  animation: floatStar 0.8s ease-out forwards;
+  pointer-events:none;
+  z-index:20;
+}
+@keyframes floatStar {
+  0%{opacity:1; transform:translateY(0) scale(1)}
+  100%{opacity:0; transform:translateY(-60px) scale(1.5)}
+}
+
+/* Question card */
+#q-card {
+  width:100%; max-width:680px;
+  background:rgba(255,255,255,0.97);
+  border-radius:16px;
+  border:3px solid #4CAF50;
+  padding:12px 18px;
+  margin: 4px 0;
+  position:relative; z-index:20;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+#q-label {
+  font-size:0.75rem; font-weight:700;
+  color:#888; text-transform:uppercase;
+  letter-spacing:1px; margin-bottom:4px;
+}
+#q-text {
+  font-size:1rem; font-weight:700;
+  color:#111; line-height:1.4;
+}
+
+/* Answer buttons */
+#answers {
+  width:100%; max-width:680px;
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:8px;
+  padding:0 0 4px;
+  position:relative; z-index:20;
+}
+.ans-btn {
+  background:#fff;
+  border:2.5px solid #ccc;
+  border-radius:12px;
+  padding:10px 12px;
+  font-size:0.85rem;
+  font-weight:700;
+  cursor:pointer;
+  text-align:left;
+  color:#222;
+  transition:transform 0.1s, border-color 0.15s, background 0.15s;
+  line-height:1.3;
+}
+.ans-btn:hover { transform:scale(1.02); border-color:#4CAF50; background:#F1F8E9; }
+.ans-btn:active { transform:scale(0.98); }
+.ans-btn.correct { background:#E8F5E9; border-color:#2E7D32; color:#1B5E20; }
+.ans-btn.wrong { background:#FFEBEE; border-color:#C62828; color:#B71C1C; }
+
+.ans-letter {
+  display:inline-block;
+  width:22px; height:22px;
+  border-radius:50%;
+  background:#E0F2F1;
+  color:#004D40;
+  font-size:11px;
+  font-weight:800;
+  text-align:center;
+  line-height:22px;
+  margin-right:6px;
+  flex-shrink:0;
+}
+
+/* Feedback strip */
+#feedback {
+  width:100%; max-width:680px;
+  border-radius:12px;
+  padding:8px 14px;
+  font-size:0.85rem;
+  font-weight:700;
+  text-align:center;
+  min-height:36px;
+  display:flex; align-items:center; justify-content:center;
+  gap:8px;
+  position:relative; z-index:20;
+  transition:all 0.3s;
+}
+#feedback.show-correct { background:#C8E6C9; color:#1B5E20; }
+#feedback.show-wrong { background:#FFCDD2; color:#B71C1C; }
+#feedback.hidden { opacity:0; pointer-events:none; }
+
+/* Overlay */
+.overlay {
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.6);
+  display:flex; align-items:center; justify-content:center;
+  z-index:100;
+}
+.ov-card {
+  background:#fff;
+  border-radius:24px;
+  padding:28px 24px;
+  text-align:center;
+  max-width:340px;
+  width:90%;
+  animation: popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popIn { from{transform:scale(0.5);opacity:0} to{transform:scale(1);opacity:1} }
+.ov-em { font-size:60px; margin-bottom:8px; }
+.ov-title { font-size:1.5rem; font-weight:800; margin-bottom:8px; }
+.ov-msg { font-size:0.95rem; color:#555; line-height:1.5; margin-bottom:20px; }
+.ov-btn {
+  background:linear-gradient(135deg,#43A047,#1B5E20);
+  color:#fff; border:none;
+  padding:13px 30px;
+  border-radius:50px;
+  font-size:1rem; font-weight:800;
+  cursor:pointer;
+  transition:transform 0.1s;
+  margin:4px;
+}
+.ov-btn:hover{transform:scale(1.04)}
+.ov-btn:active{transform:scale(0.97)}
+.ov-btn.red{background:linear-gradient(135deg,#EF5350,#B71C1C)}
+
+/* Dot progress */
+#dots {
+  display:flex; gap:6px; justify-content:center;
+  position:relative; z-index:20;
+  margin: 2px 0;
+}
+.dot {
+  width:10px; height:10px; border-radius:50%;
+  background:rgba(255,255,255,0.35);
+  border:2px solid rgba(255,255,255,0.7);
+  transition:all 0.3s;
+}
+.dot.done{background:#FFD93D;border-color:#F9A825}
+.dot.cur{background:#fff;border-color:#fff;transform:scale(1.4)}
+
+/* Confetti */
+.cft {
+  position:fixed;
+  width:9px; height:9px;
+  border-radius:2px;
+  animation:cftFall linear forwards;
+  z-index:200;
+  pointer-events:none;
+}
+@keyframes cftFall {
+  0%{transform:translateY(0) rotate(0);opacity:1}
+  100%{transform:translateY(100vh) rotate(720deg);opacity:0}
+}
+
+/* Scrolling bg clouds */
+.bg-cloud {
+  position:fixed;
+  opacity:0.5;
+  pointer-events:none;
+}
+</style>
+</head>
+<body>
+
+<div class="sun"></div>
+
+<!-- Awan dekorasi -->
+<div class="cloud" style="width:110px;height:36px;top:70px;animation-duration:22s;animation-delay:0s">
+  <div style="position:absolute;width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.92);top:-26px;left:18px"></div>
+  <div style="position:absolute;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.92);top:-18px;left:56px"></div>
+</div>
+<div class="cloud" style="width:80px;height:28px;top:130px;animation-duration:31s;animation-delay:10s">
+  <div style="position:absolute;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.92);top:-20px;left:12px"></div>
+</div>
+<div class="cloud" style="width:95px;height:32px;top:45px;animation-duration:26s;animation-delay:18s">
+  <div style="position:absolute;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.92);top:-23px;left:15px"></div>
+</div>
+
+<div class="tree" style="left:10px">🌳</div>
+<div class="tree" style="right:20px">🌲</div>
+<div class="tree" style="right:120px;font-size:44px">🌳</div>
+
+<!-- Header -->
+<div id="header">
+  <div id="title-txt">🐦 Si Pipit Terbang!</div>
+  <div style="display:flex;gap:8px">
+    <div class="badge">⭐ <span id="score">0</span></div>
+    <div class="badge">❤️ <span id="lives">3</span></div>
+  </div>
+</div>
+
+<div id="prog-wrap">
+  <div id="prog-track"><div id="prog-fill" style="width:0%"></div></div>
+</div>
+
+<div id="dots"></div>
+
+<!-- Scene -->
+<div id="scene">
+  <div id="bird">🐦</div>
+  <div id="ground-strip">
+    <span class="grass">🌿</span><span class="grass">🌱</span><span class="grass">🌿</span>
+    <span class="grass">🌱</span><span class="grass">🌿</span><span class="grass">🌱</span>
+    <span class="grass">🌿</span><span class="grass">🌱</span><span class="grass">🌿</span>
+    <span class="grass">🌱</span><span class="grass">🌿</span><span class="grass">🌱</span>
+  </div>
+</div>
+
+<!-- Soal -->
+<div id="q-card">
+  <div id="q-label">Soal 1 dari 8 — Cara Merawat Burung</div>
+  <div id="q-text">Memuat pertanyaan...</div>
+</div>
+
+<div id="answers">
+  <button class="ans-btn" id="btnA" onclick="answer(0)"><span class="ans-letter">A</span><span id="txtA"></span></button>
+  <button class="ans-btn" id="btnB" onclick="answer(1)"><span class="ans-letter">B</span><span id="txtB"></span></button>
+  <button class="ans-btn" id="btnC" onclick="answer(2)"><span class="ans-letter">C</span><span id="txtC"></span></button>
+  <button class="ans-btn" id="btnD" onclick="answer(3)"><span class="ans-letter">D</span><span id="txtD"></span></button>
+</div>
+
+<div id="feedback" class="hidden">...</div>
+
+<!-- Overlay: Start -->
+<div class="overlay" id="ov-start">
+  <div class="ov-card">
+    <div class="ov-em">🐦</div>
+    <div class="ov-title" style="color:#1B5E20">Si Pipit Terbang!</div>
+    <div class="ov-msg">
+      Bantu Pipit terbang dengan menjawab pertanyaan <strong>cara merawat burung</strong> dengan benar!<br><br>
+      ✅ Jawaban benar → Pipit senang terbang!<br>
+      ❌ Jawaban salah → Pipit kehilangan <span style="color:#E53935">❤️</span><br><br>
+      Kamu punya <strong>3 nyawa</strong>. Semangat! 💪
+    </div>
+    <button class="ov-btn" onclick="startGame()">🚀 Terbang Sekarang!</button>
+  </div>
+</div>
+
+<!-- Overlay: Game Over -->
+<div class="overlay" id="ov-gameover" style="display:none">
+  <div class="ov-card">
+    <div class="ov-em">😢</div>
+    <div class="ov-title" style="color:#C62828">Pipit Jatuh!</div>
+    <div class="ov-msg" id="go-msg">Nyawa habis! Tapi kamu sudah hebat mencoba! Mau coba lagi?</div>
+    <button class="ov-btn red" onclick="restartGame()">🔄 Coba Lagi!</button>
+  </div>
+</div>
+
+<!-- Overlay: Win -->
+<div class="overlay" id="ov-win" style="display:none">
+  <div class="ov-card">
+    <div class="ov-em">🎉</div>
+    <div class="ov-title" style="color:#1B5E20">Hebat Sekali!</div>
+    <div class="ov-msg" id="win-msg">Pipit berhasil terbang sampai tujuan! Kamu pintar merawat burung!</div>
+    <button class="ov-btn" onclick="restartGame()">🔁 Main Lagi!</button>
+  </div>
+</div>
+
+<script>
+const QS = [
+  {
+    q:"Apa yang harus diberikan kepada burung setiap hari agar tetap sehat?",
+    opts:["Makanan & minuman segar","Batu dan pasir saja","Air sabun hangat","Gula dan garam"],
+    ans:0,
+    expl:"Burung wajib diberi makanan dan minuman segar setiap hari! 🌾💧"
+  },
+  {
+    q:"Seberapa sering kandang burung sebaiknya dibersihkan?",
+    opts:["Setahun sekali saja","Setiap hari atau rutin","Hanya saat burung sakit","Tidak perlu dibersihkan"],
+    ans:1,
+    expl:"Kandang harus rutin dibersihkan agar burung sehat dan nyaman! 🧹"
+  },
+  {
+    q:"Di mana tempat terbaik untuk meletakkan sangkar burung?",
+    opts:["Di dalam lemari gelap","Di tempat lembab tertutup","Tempat terang & berudara segar","Di dalam kamar mandi"],
+    ans:2,
+    expl:"Sangkar paling baik di tempat terang dengan udara segar! ☀️"
+  },
+  {
+    q:"Makanan apa yang cocok untuk burung kicau seperti kenari?",
+    opts:["Permen dan cokelat","Nasi goreng dan mie","Biji-bijian, sayuran & buah","Es krim dan susu"],
+    ans:2,
+    expl:"Kenari suka biji-bijian, sayuran segar, dan buah! 🌾🍎"
+  },
+  {
+    q:"Apa yang harus dilakukan jika burung terlihat sakit?",
+    opts:["Dibiarkan saja dulu","Diberi makanan pedas","Bawa ke dokter hewan","Dipindah ke kandang gelap"],
+    ans:2,
+    expl:"Burung sakit harus segera dibawa ke dokter hewan! 🏥🩺"
+  },
+  {
+    q:"Berapa kali air minum burung sebaiknya diganti?",
+    opts:["Seminggu sekali","Sebulan sekali","Tidak perlu diganti","Minimal sekali sehari"],
+    ans:3,
+    expl:"Air minum harus diganti minimal sekali sehari agar tetap bersih! 💧"
+  },
+  {
+    q:"Mengapa burung perlu dimandikan atau disemprot air?",
+    opts:["Agar tidak bisa terbang","Agar tidak lapar","Agar bulu bersih & sehat","Agar suaranya hilang"],
+    ans:2,
+    expl:"Mandi membuat bulu burung bersih, sehat, dan berkilap! ✨"
+  },
+  {
+    q:"Apa manfaat sering mengajak burung berkomunikasi & mendengarkan kicauan?",
+    opts:["Burung menjadi bisu","Burung belajar kicau lebih merdu","Burung menjadi mengantuk","Burung tidak mau makan"],
+    ans:1,
+    expl:"Burung yang sering berinteraksi akan semakin pandai berkicau! 🎵🐦"
+  }
+];
+
+let cur = 0, score = 0, lives = 3, answered = false, gameActive = false;
+const bird = document.getElementById('bird');
+
+function buildDots(){
+  const d = document.getElementById('dots'); d.innerHTML='';
+  for(let i=0;i<QS.length;i++){
+    const el=document.createElement('div');
+    el.className='dot'+(i<cur?' done':i===cur?' cur':'');
+    d.appendChild(el);
+  }
+}
+
+function updateLives(){
+  const hearts=['❤️❤️❤️','❤️❤️🖤','❤️🖤🖤','🖤🖤🖤'];
+  document.getElementById('lives').textContent = lives>0?['❤️❤️❤️','❤️❤️','❤️'][3-lives]||'💔':'💔';
+  document.getElementById('lives').textContent = lives===3?'❤️❤️❤️':lives===2?'❤️❤️':lives===1?'❤️':'💔';
+}
+
+function loadQ(){
+  const q=QS[cur];
+  document.getElementById('q-label').textContent=`Soal ${cur+1} dari ${QS.length} — Cara Merawat Burung`;
+  document.getElementById('q-text').textContent=q.q;
+  const ids=['A','B','C','D'];
+  ids.forEach((id,i)=>{
+    document.getElementById('txt'+id).textContent=q.opts[i];
+    const b=document.getElementById('btn'+id);
+    b.className='ans-btn';
+    b.disabled=false;
+  });
+  document.getElementById('prog-fill').style.width=(cur/QS.length*100)+'%';
+  hideFeedback();
+  resetBird();
+  buildDots();
+  answered=false;
+  spawnPipeAnim();
+}
+
+function resetBird(){
+  bird.style.top='50%';
+  bird.style.transform='translateY(-50%)';
+  bird.className='';
+  bird.textContent='🐦';
+}
+
+function spawnPipeAnim(){
+  const scene=document.getElementById('scene');
+  const old=scene.querySelectorAll('.pipe,.pipe-label');
+  old.forEach(e=>e.remove());
+  if(cur>=QS.length)return;
+
+  const gapTop = 55 + Math.random()*60;
+  const gapH = 80;
+  const pw = 52;
+  const groundH = 36;
+  const sceneH = 220;
+  const maxBottom = sceneH - groundH - gapTop - gapH;
+
+  // top pipe
+  const pt=document.createElement('div');
+  pt.className='pipe pipe-top';
+  pt.style.width=pw+'px';
+  pt.style.height=gapTop+'px';
+  pt.style.left='700px';
+  scene.appendChild(pt);
+
+  // bottom pipe
+  const pb=document.createElement('div');
+  pb.className='pipe pipe-bottom';
+  pb.style.width=pw+'px';
+  pb.style.height=maxBottom+'px';
+  pb.style.left='700px';
+  scene.appendChild(pb);
+}
+
+function answer(idx){
+  if(!gameActive||answered)return;
+  answered=true;
+  const q=QS[cur];
+  const correct=idx===q.ans;
+  const ids=['A','B','C','D'];
+
+  ids.forEach((id,i)=>{
+    const b=document.getElementById('btn'+id);
+    b.disabled=true;
+    if(i===q.ans) b.classList.add('correct');
+    else if(i===idx&&!correct) b.classList.add('wrong');
+  });
+
+  if(correct){
+    score+=10;
+    document.getElementById('score').textContent=score;
+    bird.className='happy';
+    bird.textContent='🐦';
+    showFeedback(true, '✅ Benar! '+q.expl);
+    spawnStar();
+    spawnConfetti(6);
+    setTimeout(()=>{
+      cur++;
+      if(cur>=QS.length){ showWin(); return; }
+      loadQ();
+    },1800);
+  } else {
+    lives--;
+    updateLives();
+    bird.className='fall';
+    bird.textContent='😵';
+    showFeedback(false,'❌ Ups! '+q.expl);
+    if(lives<=0){
+      setTimeout(showGameOver,1500);
+    } else {
+      setTimeout(()=>{
+        // retry same question
+        answered=false;
+        resetBird();
+        const ids=['A','B','C','D'];
+        ids.forEach(id=>{
+          const b=document.getElementById('btn'+id);
+          b.className='ans-btn';
+          b.disabled=false;
+        });
+        hideFeedback();
+        spawnPipeAnim();
+      },1800);
+    }
+  }
+}
+
+function showFeedback(ok,msg){
+  const f=document.getElementById('feedback');
+  f.className=ok?'show-correct':'show-wrong';
+  f.textContent=msg;
+}
+function hideFeedback(){
+  const f=document.getElementById('feedback');
+  f.className='hidden';
+}
+
+function spawnStar(){
+  const s=document.createElement('div');
+  s.className='star';
+  s.textContent='⭐';
+  s.style.left=(70+Math.random()*40)+'px';
+  s.style.top=(80+Math.random()*40)+'px';
+  document.getElementById('scene').appendChild(s);
+  setTimeout(()=>s.remove(),900);
+}
+
+function spawnConfetti(n){
+  const colors=['#FF5252','#FFEB3B','#4CAF50','#2196F3','#E91E63','#FF9800'];
+  for(let i=0;i<n;i++){
+    const el=document.createElement('div');
+    el.className='cft';
+    el.style.left=Math.random()*100+'vw';
+    el.style.top='-20px';
+    el.style.background=colors[Math.floor(Math.random()*colors.length)];
+    el.style.animationDuration=(1.2+Math.random()*1.8)+'s';
+    el.style.animationDelay=Math.random()*0.4+'s';
+    el.style.borderRadius=Math.random()>.5?'50%':'2px';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),3500);
+  }
+}
+
+function showWin(){
+  gameActive=false;
+  document.getElementById('prog-fill').style.width='100%';
+  buildDots();
+  for(let i=0;i<30;i++) setTimeout(()=>spawnConfetti(3),i*80);
+  const msg=score>=70
+    ?`🏆 Luar biasa! Skor kamu <strong>${score}</strong> dari 80!<br>Pipit sangat bahagia punya teman yang pintar! 🐦🌟`
+    :`Skor kamu <strong>${score}</strong> dari 80!<br>Terus semangat belajar merawat burung ya! 🐦`;
+  document.getElementById('win-msg').innerHTML=msg;
+  document.getElementById('ov-win').style.display='flex';
+  bird.className='happy';
+}
+
+function showGameOver(){
+  gameActive=false;
+  const q=QS[cur];
+  document.getElementById('go-msg').innerHTML=
+    `Nyawa habis di soal ${cur+1}!<br>Kamu menjawab <strong>${score/10} dari ${cur+1}</strong> soal dengan benar.<br><br>Jangan menyerah, coba lagi! 💪`;
+  document.getElementById('ov-gameover').style.display='flex';
+  bird.textContent='😵';
+}
+
+function startGame(){
+  document.getElementById('ov-start').style.display='none';
+  gameActive=true;
+  loadQ();
+}
+
+function restartGame(){
+  cur=0; score=0; lives=3;
+  document.getElementById('score').textContent=0;
+  updateLives();
+  document.getElementById('ov-gameover').style.display='none';
+  document.getElementById('ov-win').style.display='none';
+  gameActive=true;
+  loadQ();
+}
+
+updateLives();
+buildDots();
+</script>
+</body>
+</html>
