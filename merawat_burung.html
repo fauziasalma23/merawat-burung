@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cara Merawat Burung 🐦</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #FFF9F0; min-height: 100vh; padding: 1.5rem 1rem 3rem; }
+  h1 { font-size: 24px; font-weight: 600; color: #2C2C2A; text-align: center; margin-bottom: 4px; }
+  .subtitle { font-size: 14px; color: #888780; text-align: center; margin-bottom: 1.5rem; }
+
+  .bird-wrap { text-align: center; margin-bottom: 0.5rem; }
+  .bird { font-size: 72px; display: inline-block; cursor: pointer; animation: bounce 1.8s infinite; line-height: 1; }
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+  .chirp-msg { text-align: center; font-size: 16px; font-weight: 600; color: #0F6E56; min-height: 26px; margin: 6px 0 1.25rem; transition: opacity 0.3s; }
+
+  .nav { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 1.25rem; }
+  .nav-btn { font-size: 14px; padding: 10px 20px; border-radius: 999px; border: 1.5px solid #D3D1C7; background: #fff; color: #5F5E5A; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+  .nav-btn:hover { background: #E1F5EE; border-color: #1D9E75; color: #085041; }
+  .nav-btn.active { background: #E1F5EE; border-color: #1D9E75; color: #085041; font-weight: 600; }
+
+  .card { background: #fff; border-radius: 20px; border: 1.5px solid #D3D1C7; padding: 1.25rem; animation: pop 0.25s ease; }
+  @keyframes pop { 0%{transform:scale(0.95);opacity:0} 100%{transform:scale(1);opacity:1} }
+
+  .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .card-emoji { font-size: 40px; }
+  .card-title { font-size: 18px; font-weight: 600; color: #2C2C2A; }
+  .card-desc { font-size: 15px; color: #5F5E5A; line-height: 1.7; margin-bottom: 12px; }
+
+  .items { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+  .item { background: #F1EFE8; border-radius: 12px; padding: 10px 14px; font-size: 15px; color: #2C2C2A; }
+
+  .tip { border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; font-size: 14px; }
+
+  .speak-btn { font-size: 14px; padding: 8px 20px; border-radius: 999px; border: 1.5px solid #D3D1C7; background: #F1EFE8; color: #5F5E5A; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; }
+  .speak-btn:hover { background: #E1F5EE; border-color: #1D9E75; color: #085041; }
+
+  .footer { margin-top: 1.5rem; background: #FAEEDA; border-radius: 16px; padding: 1rem 1.25rem; text-align: center; font-size: 15px; color: #412402; }
+
+  .click-hint { font-size: 12px; color: #888780; text-align: center; margin-bottom: 1rem; }
+</style>
+</head>
+<body>
+
+<h1>Cara Merawat Burung 🐦</h1>
+<p class="subtitle">Belajar sayang sama burung, yuk!</p>
+
+<div class="bird-wrap">
+  <div class="bird" onclick="chirp()">🐦</div>
+</div>
+<p class="click-hint">Klik burungnya!</p>
+
+<div class="chirp-msg" id="chirp-msg"></div>
+
+<p style="font-size:15px;font-weight:600;color:#2C2C2A;text-align:center;margin-bottom:10px;">Pilih caranya:</p>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="show(0,this)">🌾 Makan</button>
+  <button class="nav-btn" onclick="show(1,this)">💧 Minum</button>
+  <button class="nav-btn" onclick="show(2,this)">🏠 Kandang</button>
+  <button class="nav-btn" onclick="show(3,this)">🤗 Sayang</button>
+</div>
+
+<div id="content"></div>
+
+<div class="footer">Burung juga perlu disayang ya, teman-teman! 💛🐦</div>
+
+<script>
+const steps = [
+  {
+    emoji:"🌾", title:"Kasih makan burung!",
+    tipBg:"#E1F5EE", tipColor:"#085041", borderColor:"#1D9E75",
+    desc:"Burung perlu makan setiap hari. Kasih makan pagi dan sore ya!",
+    items:["🌾 Biji-bijian","🍎 Buah","🥦 Sayur"],
+    suara:"Cip cip! Makasih makannya ya!",
+    tip:"Jangan kasih cokelat — itu tidak baik untuk burung!"
+  },
+  {
+    emoji:"💧", title:"Kasih minum burung!",
+    tipBg:"#E6F1FB", tipColor:"#0C447C", borderColor:"#378ADD",
+    desc:"Burung perlu minum air bersih setiap hari. Ganti airnya setiap pagi!",
+    items:["💧 Air bersih","🪣 Wadah yang bersih","🔄 Diganti setiap pagi"],
+    suara:"Gluk gluk! Airnya segar!",
+    tip:"Jangan kasih air kotor ya — burung bisa sakit!"
+  },
+  {
+    emoji:"🏠", title:"Bersihkan kandangnya!",
+    tipBg:"#FBEAF0", tipColor:"#72243E", borderColor:"#D4537E",
+    desc:"Kandang burung harus dibersihkan setiap hari supaya burung sehat!",
+    items:["🧹 Bersihkan setiap hari","☀️ Jemur di pagi hari","🐦 Beri ruang yang luas"],
+    suara:"Kicau kicau! Kandangku bersih!",
+    tip:"Kandang bersih bikin burung senang!"
+  },
+  {
+    emoji:"🤗", title:"Sayangi burungmu!",
+    tipBg:"#FAEEDA", tipColor:"#412402", borderColor:"#BA7517",
+    desc:"Ajak bicara burungmu setiap hari. Burung suka diperhatikan!",
+    items:["🗣️ Ajak bicara","🤲 Pegang pelan-pelan","🎵 Nyanyikan lagu"],
+    suara:"Kicau kicau! Aku senang disayang!",
+    tip:"Pegang burung pelan-pelan ya, jangan kencang!"
+  }
+];
+
+function show(i, btn) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render(i);
+}
+
+function render(i) {
+  const s = steps[i];
+  document.getElementById('content').innerHTML = `
+    <div class="card" style="border-color:${s.borderColor};">
+      <div class="card-header">
+        <span class="card-emoji">${s.emoji}</span>
+        <p class="card-title">${s.title}</p>
+      </div>
+      <p class="card-desc">${s.desc}</p>
+      <div class="items">
+        ${s.items.map(it => `<div class="item">${it}</div>`).join('')}
+      </div>
+      <div class="tip" style="background:${s.tipBg};color:${s.tipColor};">⚠️ ${s.tip}</div>
+      <button class="speak-btn" onclick="speak(${i})">🔊 Dengar suara burung</button>
+    </div>
+  `;
+}
+
+function speak(i) {
+  tampil('🐦 "' + steps[i].suara + '"');
+  bicara(steps[i].suara);
+}
+
+function chirp() {
+  const p = ["Kicau kicau!","Cip cip cip!","Aku lapar!","Kasih aku makan!","Aku senang!"];
+  const txt = p[Math.floor(Math.random() * p.length)];
+  tampil('🐦 "' + txt + '"');
+  bicara(txt);
+}
+
+function tampil(txt) {
+  const el = document.getElementById('chirp-msg');
+  el.textContent = txt;
+  el.style.opacity = '1';
+  setTimeout(() => el.style.opacity = '0', 2500);
+}
+
+function bicara(txt) {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(txt);
+    u.lang = 'id-ID'; u.rate = 0.85; u.pitch = 1.4;
+    window.speechSynthesis.speak(u);
+  }
+}
+
+render(0);
+</script>
+</body>
+</html>
