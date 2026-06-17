@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cara Merawat Ikan 🐠</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #E6F1FB; min-height: 100vh; padding: 1.5rem 1rem 3rem; }
+
+h1 { font-size: 24px; font-weight: 600; color: #2C2C2A; text-align: center; margin-bottom: 4px; }
+.subtitle { font-size: 14px; color: #5F5E5A; text-align: center; margin-bottom: 1.25rem; }
+
+.tank { position: relative; width: 100%; max-width: 480px; margin: 0 auto 1.5rem; height: 200px; background: linear-gradient(180deg, #B5D4F4 0%, #85B7EB 100%); border-radius: 20px; overflow: hidden; border: 6px solid #fff; box-shadow: 0 2px 0 #D3D1C7 inset; cursor: pointer; }
+.bubble { position: absolute; bottom: -10px; background: rgba(255,255,255,0.5); border-radius: 50%; animation: rise linear infinite; }
+@keyframes rise { from{ bottom:-10px; opacity:0.8 } to{ bottom:210px; opacity:0 } }
+.swimfish { position: absolute; font-size: 32px; animation: swim 6s ease-in-out infinite; }
+@keyframes swim { 0%{ left:-10%; transform:scaleX(1) } 48%{ transform:scaleX(1) } 50%{ left:90%; transform:scaleX(-1) } 98%{ transform:scaleX(-1) } 100%{ left:-10%; transform:scaleX(1) } }
+.plant { position: absolute; bottom: 0; font-size: 36px; }
+.tank-hint { text-align: center; font-size: 12px; color: #5F5E5A; margin-bottom: 1.25rem; }
+
+.chirp-msg { text-align: center; font-size: 16px; font-weight: 600; color: #185FA5; min-height: 26px; margin-bottom: 1.25rem; transition: opacity 0.3s; }
+
+.nav { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 1.25rem; }
+.nav-btn { font-size: 14px; padding: 10px 18px; border-radius: 999px; border: 1.5px solid #D3D1C7; background: #fff; color: #5F5E5A; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+.nav-btn:hover { background: #E6F1FB; border-color: #378ADD; }
+.nav-btn.active { background: #E6F1FB; border-color: #378ADD; color: #0C447C; font-weight: 600; }
+
+.card { background: #fff; border-radius: 20px; border: 1.5px solid #D3D1C7; padding: 1.25rem; max-width: 480px; margin: 0 auto; animation: pop 0.25s ease; }
+@keyframes pop { 0%{transform:scale(0.95);opacity:0} 100%{transform:scale(1);opacity:1} }
+
+.card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.card-illust { width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.card-title { font-size: 18px; font-weight: 600; color: #2C2C2A; }
+.card-desc { font-size: 15px; color: #5F5E5A; line-height: 1.7; margin-bottom: 14px; }
+
+.illust-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 14px; flex-wrap: wrap; }
+.illust-box { width: 90px; height: 90px; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+.illust-box .emoji { font-size: 32px; }
+.illust-box .label { font-size: 11px; font-weight: 600; text-align: center; padding: 0 4px; }
+
+.tip { border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; font-size: 14px; line-height: 1.5; }
+
+.speak-btn { font-size: 14px; padding: 8px 20px; border-radius: 999px; border: 1.5px solid #D3D1C7; background: #F1EFE8; color: #5F5E5A; cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; width: 100%; justify-content: center; }
+.speak-btn:hover { background: #E6F1FB; border-color: #378ADD; color: #0C447C; }
+
+.footer { margin-top: 1.5rem; background: #FAEEDA; border-radius: 16px; padding: 1rem 1.25rem; text-align: center; font-size: 15px; color: #412402; max-width: 480px; margin-left: auto; margin-right: auto; }
+.click-hint { font-size: 12px; color: #888780; text-align: center; margin-bottom: 1rem; }
+</style>
+</head>
+<body>
+
+<h1>Cara Merawat Ikan 🐠</h1>
+<p class="subtitle">Yuk belajar sayang sama ikan!</p>
+
+<div class="tank" onclick="splash()" id="tank">
+  <div class="plant" style="left:8%;">🌿</div>
+  <div class="plant" style="left:75%; font-size:28px;">🌱</div>
+  <div class="swimfish" style="top:30%; animation-duration:7s;">🐠</div>
+  <div class="swimfish" style="top:60%; animation-duration:5s; animation-delay:1s; font-size:24px;">🐟</div>
+  <div class="swimfish" style="top:45%; animation-duration:8s; animation-delay:2s; font-size:20px;">🐡</div>
+</div>
+<p class="tank-hint">Klik aquariumnya!</p>
+
+<div class="chirp-msg" id="chirp-msg"></div>
+
+<p style="font-size:15px;font-weight:600;color:#2C2C2A;text-align:center;margin-bottom:10px;">Pilih caranya:</p>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="show(0,this)">🍽️ Makan</button>
+  <button class="nav-btn" onclick="show(1,this)">💧 Air</button>
+  <button class="nav-btn" onclick="show(2,this)">🧽 Bersih</button>
+  <button class="nav-btn" onclick="show(3,this)">🤲 Sayang</button>
+</div>
+
+<div id="content"></div>
+
+<div class="footer">Ikan juga perlu disayang ya, teman-teman! 💙🐠</div>
+
+<script>
+const steps = [
+  {
+    emoji:"🍽️", title:"Beri makan ikan!",
+    illBg:"#E6F1FB", illColor:"#0C447C", borderColor:"#378ADD",
+    desc:"Ikan perlu makan pelet ikan setiap hari. Beri makan sedikit saja, pagi dan sore ya!",
+    items:[
+      {e:"🟤", l:"Pelet ikan"},
+      {e:"☀️", l:"Pagi hari"},
+      {e:"🌇", l:"Sore hari"}
+    ],
+    suara:"Kecipak kecipak! Makasih makannya!",
+    tip:"Jangan kasih makan kebanyakan ya, nanti airnya jadi kotor!"
+  },
+  {
+    emoji:"💧", title:"Ganti air aquarium!",
+    illBg:"#E6F1FB", illColor:"#0C447C", borderColor:"#378ADD",
+    desc:"Air aquarium harus diganti supaya bersih. Ganti seminggu sekali ya, supaya ikan tidak sakit!",
+    items:[
+      {e:"🪣", l:"Air bersih"},
+      {e:"📅", l:"Seminggu sekali"},
+      {e:"😊", l:"Ikan senang"}
+    ],
+    suara:"Byur byur! Airnya jadi segar!",
+    tip:"Diamkan air semalaman dulu sebelum dipakai ya!"
+  },
+  {
+    emoji:"🧽", title:"Bersihkan aquarium!",
+    illBg:"#E1F5EE", illColor:"#085041", borderColor:"#1D9E75",
+    desc:"Kaca aquarium yang berlumut harus dibersihkan pakai sikat kecil supaya ikan nyaman!",
+    items:[
+      {e:"🧽", l:"Sikat kecil"},
+      {e:"✨", l:"Kaca bersih"},
+      {e:"🐠", l:"Ikan nyaman"}
+    ],
+    suara:"Kecipak kecipak! Aquariumku bersih!",
+    tip:"Aquarium yang bersih bikin ikan tidak mudah sakit!"
+  },
+  {
+    emoji:"🤲", title:"Sayangi ikanmu!",
+    illBg:"#FBEAF0", illColor:"#72243E", borderColor:"#D4537E",
+    desc:"Ikan itu rapuh, jangan dipegang sembarangan ya. Cukup lihat saja dan jaga aquariumnya!",
+    items:[
+      {e:"👀", l:"Lihat saja"},
+      {e:"��", l:"Jaring lembut"},
+      {e:"💙", l:"Sayangi"}
+    ],
+    suara:"Kecipak kecipak! Aku senang disayang!",
+    tip:"Kalau mau pindahkan ikan, pakai jaring kecil yang lembut ya!"
+  }
+];
+
+function show(i, btn) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render(i);
+}
+
+function render(i) {
+  const s = steps[i];
+  document.getElementById('content').innerHTML = `
+    <div class="card" style="border-color:${s.borderColor};">
+      <div class="card-header">
+        <div class="card-illust" style="background:${s.illBg};">
+          <span style="font-size:32px;">${s.emoji}</span>
+        </div>
+        <p class="card-title">${s.title}</p>
+      </div>
+      <p class="card-desc">${s.desc}</p>
+      <div class="illust-row">
+        ${s.items.map(it => `
+          <div class="illust-box" style="background:${s.illBg};">
+            <span class="emoji">${it.e}</span>
+            <span class="label" style="color:${s.illColor};">${it.l}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="tip" style="background:${s.illBg};color:${s.illColor};">⚠️ ${s.tip}</div>
+      <button class="speak-btn" onclick="speak(${i})">🔊 Dengar suara ikan</button>
+    </div>
+  `;
+}
+
+function speak(i) {
+  tampil('🐠 "' + steps[i].suara + '"');
+  bicara(steps[i].suara);
+}
+
+function splash() {
+  const p = ["Kecipak kecipak!","Byur byur!","Aku lapar!","Aquariumku bersih!","Aku senang!"];
+  const txt = p[Math.floor(Math.random() * p.length)];
+  tampil('🐠 "' + txt + '"');
+  bicara(txt);
+
+  const tank = document.getElementById('tank');
+  for (let n = 0; n < 5; n++) {
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    const size = 6 + Math.random() * 8;
+    b.style.width = size + 'px';
+    b.style.height = size + 'px';
+    b.style.left = (10 + Math.random() * 80) + '%';
+    b.style.animationDuration = (2 + Math.random() * 1.5) + 's';
+    tank.appendChild(b);
+    setTimeout(() => b.remove(), 3500);
+  }
+}
+
+function tampil(txt) {
+  const el = document.getElementById('chirp-msg');
+  el.textContent = txt;
+  el.style.opacity = '1';
+  setTimeout(() => el.style.opacity = '0', 2500);
+}
+
+function bicara(txt) {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(txt);
+    u.lang = 'id-ID'; u.rate = 0.85; u.pitch = 1.4;
+    window.speechSynthesis.speak(u);
+  }
+}
+
+setInterval(() => {
+  const tank = document.getElementById('tank');
+  const b = document.createElement('div');
+  b.className = 'bubble';
+  const size = 4 + Math.random() * 6;
+  b.style.width = size + 'px';
+  b.style.height = size + 'px';
+  b.style.left = (10 + Math.random() * 80) + '%';
+  b.style.animationDuration = (3 + Math.random() * 2) + 's';
+  tank.appendChild(b);
+  setTimeout(() => b.remove(), 6000);
+}, 1200);
+
+render(0);
+</script>
+</body>
+</html>
