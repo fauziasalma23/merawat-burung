@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .project-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            font-size: 3em;
+        }
+
+        .project-content {
+            padding: 25px;
+        }
+
+        .project-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .project-desc {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .project-features {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .project-features li {
+            margin-left: 20px;
+            margin-bottom: 5px;
+        }
+
+        .project-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+        }
+
+        .project-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 30px;
+            opacity: 0.8;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 My Projects</h1>
+            <p>Kumpulan project interaktif yang menarik</p>
+        </div>
+
+        <div class="projects-grid">
+            <!-- Project 1: Merawat Ikan -->
+            <div class="project-card">
+                <div class="project-header">🐠</div>
+                <div class="project-content">
+                    <div class="project-title">Cara Merawat Ikan</div>
+                    <div class="project-desc">
+                        Aplikasi edukatif untuk belajar cara merawat ikan dengan tampilan interaktif yang menyenangkan.
+                    </div>
+                    <div class="project-features">
+                        <strong>Fitur:</strong>
+                        <ul>
+                            <li>🍽️ Panduan memberi makan</li>
+                            <li>💧 Cara mengganti air</li>
+                            <li>🧽 Tips membersihkan</li>
+                            <li>🎵 Suara interaktif</li>
+                        </ul>
+                    </div>
+                    <a href="merawat_ikan.html" class="project-button">Buka Project</a>
+                </div>
+            </div>
+
+            <!-- Project 2: Weather Dashboard -->
+            <div class="project-card">
+                <div class="project-header">🌤️</div>
+                <div class="project-content">
+                    <div class="project-title">Weather Dashboard</div>
+                    <div class="project-desc">
+                        Dashboard cuaca real-time dengan informasi lengkap dan prakiraan 12 jam untuk kota manapun.
+                    </div>
+                    <div class="project-features">
+                        <strong>Fitur:</strong>
+                        <ul>
+                            <li>🔍 Pencarian kota</li>
+                            <li>📍 Lokasi saat ini</li>
+                            <li>⏰ Forecast 12 jam</li>
+                            <li>💨 Info cuaca lengkap</li>
+                        </ul>
+                    </div>
+                    <a href="weather_dashboard.html" class="project-button">Buka Project</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2026 Fauzia Salma | Made with ❤️ using HTML, CSS & JavaScript</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">
+                <a href="https://github.com/fauziasalma23/merawat-burung" style="color: white; text-decoration: none;">
+                    📦 View on GitHub
+                </a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
